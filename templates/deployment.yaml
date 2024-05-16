@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weatherapp-deployment
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: {{ .Values.deploymentstrategy.type }}
+    rollingUpdate:
+      maxSurge: {{ .Values.deploymentstrategy.maxSurge }}
+      maxUnavailable: {{ .Values.deploymentstrategy.maxUnavailable }}
+  selector:
+    matchLabels:
+      app: weather
+  template:
+    metadata:
+      labels:
+        app: weather
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        volumeMounts:
+        - name: history
+          mountPath: /app/history
+        ports:
+        - containerPort: {{ .Values.service.targetPort }}
+        env:
+        - name: BACKGROUND_COLOR
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.colorcm }}
+              key: image
+      imagePullSecrets:
+      - name: {{ .Values.secret.name }}
+      volumes:
+      - name: history
+        persistentVolumeClaim:
+          claimName: ebs-pvc

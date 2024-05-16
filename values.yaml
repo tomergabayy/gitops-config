@@ -1,0 +1,24 @@
+replicaCount: 2
+
+image:
+  repository: tomergabayy/whatstheweather
+  tag: "1.0.1"
+
+service:
+  name: weather-service
+  port: 32300
+  targetPort: 8000
+  type: 'NodePort'
+
+host:
+  name: weather.tomerg.click
+
+secret:
+  name: myregistrykey
+
+deploymentstrategy:
+  type: RollingUpdate
+  maxSurge: 25%
+  maxUnavailable: 2
+
+colorcm: blue-config
